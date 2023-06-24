@@ -1,0 +1,129 @@
+#!/usr/bin/env python3
+
+import sys
+import os
+from pathlib import Path
+# add parent path of lib dir to path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from optparse import OptionParser
+from datetime import datetime
+
+from lib.Files import Files
+       
+
+# read a new task
+def read(data_folder,date):
+    filename = date + '.txt'
+    filepath = data_folder / filename
+    tasks = Files(filepath)
+    taskCount = tasks.count() 
+    if tasks.count() > 0:
+        print(f'\nTasks for {date}:  {taskCount}\n')
+        count = 1;
+        for i in tasks.get():
+            print(f'\t{count}. {i}')
+            count+=1
+    else:
+        print(f'\nTasks for {date}:  0\n')        
+#def insert
+
+# insert a new task
+def insert(data_folder,date,task):
+    if task == '':
+        print("Error: Empty tasks are not allowed!")
+        return 2
+        
+    filename = date + '.txt'
+    filepath = data_folder / filename
+    Files(filepath).append(task)
+    print('Task added!')
+
+"""
+Clear all tasks
+"""    
+def clear(data_folder,date):
+    filename = date + '.txt'
+    filepath = data_folder / filename
+    Files(filepath).clear()
+    print('Tasks cleared!')
+
+def remove(data_folder,date,index):
+    # validate this index properly
+    index = int(index)
+    index = index -1                     
+    
+    if int(index) < 0:
+        print('Task index to remove must be greater than 0');
+
+    filename = date + '.txt'
+    filepath = data_folder / filename
+    if Files(filepath).removeOne(index):
+        print('Task removed')    
+
+
+
+def main():
+    usage = "usage: %prog [options] n"
+    parser = OptionParser(usage)
+    parser.add_option(
+        "-a",
+        "--action",
+        help="ACTION=read|insert|clear|remove",
+        dest="action",
+        default="read"
+    )
+    parser.add_option(
+        "-i",
+        "--index",
+        help="INDEX=task_number",
+        dest="index",
+        default="0"
+    )    
+    
+    parser.add_option(
+        "-d","--date",
+        dest="date",
+        default=datetime.today().strftime('%Y-%m-%d')
+    )
+    parser.add_option(
+        "-t","--task",
+        dest="task",
+        default=""
+    )
+    (options, args) = parser.parse_args()
+
+    ##################################### start the program
+    #Access program options and args:  https://docs.python.org/3/library/optparse.html#putting-it-all-together
+
+    DATA_FOLDER=Path(__file__).resolve().parent.parent / "data"
+
+    # make sure that date exists and is in the correct format
+    date = None
+    try:
+        date = datetime.fromisoformat(options.date)
+    except ValueError:
+        print("Error: Given date is incorrect")
+        return 1
+
+    date = date.strftime('%Y-%m-%d')
+
+    if options.action == 'read':
+        # date has to have correct format
+        read(DATA_FOLDER,date);
+    elif options.action == "insert":
+        insert(DATA_FOLDER,date,options.task);
+    elif options.action == "clear":
+        clear(DATA_FOLDER,date);
+    elif options.action == "remove":
+        remove(DATA_FOLDER,date,options.index);
+    else:
+        print("some other action")    
+    
+
+    ###################################### end of program
+     
+        
+if __name__ == "__main__":
+    main()
+

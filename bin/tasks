@@ -12,23 +12,28 @@ from datetime import datetime
 from lib.Files import Files
        
 
-# read a new task
+"""
+Read tasks
+"""
 def read(data_folder,date):
     filename = date + '.txt'
     filepath = data_folder / filename
-    tasks = Files(filepath)
-    taskCount = tasks.count() 
-    if tasks.count() > 0:
+    f = Files(filepath)
+    tasks = f.get()
+    taskCount = len(tasks) 
+    if taskCount > 0:
         print(f'\nTasks for {date}:  {taskCount}\n')
         count = 1;
-        for i in tasks.get():
+        for i in tasks:
             print(f'\t{count}. {i}')
             count+=1
     else:
         print(f'\nTasks for {date}:  0\n')        
 #def insert
 
-# insert a new task
+"""
+insert() - Insert a task
+"""
 def insert(data_folder,date,task):
     if task == '':
         print("Error: Empty tasks are not allowed!")
@@ -40,14 +45,45 @@ def insert(data_folder,date,task):
     print('Task added!')
 
 """
-Clear all tasks
+clear() - Clear all tasks
 """    
 def clear(data_folder,date):
     filename = date + '.txt'
     filepath = data_folder / filename
-    Files(filepath).clear()
-    print('Tasks cleared!')
+    if Files(filepath).clear():
+        print('Tasks cleared!')
+    else:
+        print("Task could not be cleared")    
 
+
+"""
+update a task
+"""
+def update(data_folder,date,index,value):
+    # validate this index properly
+    index = int(index)
+    index = index -1                     
+    
+    if int(index) < 0:
+        print('Task index to update must be greater than 0');
+
+    if value == "":
+        print("Empty task. If you want to remove task, try -a remove -i index")
+        return
+
+    filename = date + '.txt'
+    filepath = data_folder / filename
+    try:
+        Files(filepath).update(index,value)
+        print('Task updated')
+    except IndexError:
+        print("Incorrect task index")
+        return 1
+
+
+"""
+remove a task
+"""
 def remove(data_folder,date,index):
     # validate this index properly
     index = int(index)
@@ -58,18 +94,23 @@ def remove(data_folder,date,index):
 
     filename = date + '.txt'
     filepath = data_folder / filename
-    if Files(filepath).removeOne(index):
-        print('Task removed')    
-
-
+    try:
+        Files(filepath).removeOne(index)
+        print('Task removed')
+    except IndexError:
+        print("Incorrect task index")
+        return 1    
+            
+def help(parser):
+    parser.print_help()    
 
 def main():
-    usage = "usage: %prog [options] n"
+    usage = "usage: %prog [options]"
     parser = OptionParser(usage)
     parser.add_option(
         "-a",
         "--action",
-        help="ACTION=read|insert|clear|remove",
+        help="ACTION=read|insert|clear|remove|update",
         dest="action",
         default="read"
     )
@@ -117,9 +158,10 @@ def main():
         clear(DATA_FOLDER,date);
     elif options.action == "remove":
         remove(DATA_FOLDER,date,options.index);
+    elif options.action == "update":
+        update(DATA_FOLDER,date,options.index,options.task);
     else:
-        print("some other action")    
-    
+        help(parser)
 
     ###################################### end of program
      

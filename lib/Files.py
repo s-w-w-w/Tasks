@@ -2,7 +2,7 @@ from pathlib import Path
 import os
 """
 Files - handle operations on a single file
-    Version: 1.0.12
+    Version: 1.0.13
     Methods:
         __init__() - constructor
         __readAll() - read all file contents
@@ -77,9 +77,11 @@ class Files(object):
         return True                
 
     """
-    removeOne() - Remove line number "index" from file
+    update() - update string at index index with a new value
         Indexing starts at 0
-        Input: index - nonnegative integer
+        Input: 
+            index - nonnegative integer
+            value - string
     """
     def update(self,index, value):
         data = self.get()
@@ -88,6 +90,24 @@ class Files(object):
             return self.write(data)
         else: 
             raise IndexError("Index not in range")
+            
+    """
+    supplement() - append extra value to a string at index index
+        Indexing starts at 0
+        Input: 
+            index - nonnegative integer
+            value - string
+            
+        Output: 
+            Bool - True
+    """
+    def supplement(self,index, value):
+        data = self.get()
+        if 0 <= index < len(data):
+            data[index] = data[index].rstrip() + f" {value}"
+            return self.write(data)
+        else: 
+            raise IndexError("Index not in range")            
         
 
     """

@@ -13,7 +13,7 @@ from lib.Files import Files
        
 
 """
-Read tasks
+read() - Read tasks
 """
 def read(data_folder,date):
     filename = date + '.txt'
@@ -29,7 +29,7 @@ def read(data_folder,date):
             count+=1
     else:
         print(f'\nTasks for {date}:  0\n')        
-#def insert
+
 
 """
 insert() - Insert a task
@@ -57,7 +57,7 @@ def clear(data_folder,date):
 
 
 """
-update a task
+update() - update a task
 """
 def update(data_folder,date,index,value):
     # validate this index properly
@@ -80,6 +80,29 @@ def update(data_folder,date,index,value):
         print("Incorrect task index")
         return 1
 
+"""
+supplement - supplement task
+"""
+def supplement(data_folder,date,index,value):
+    # validate this index properly
+    index = int(index)
+    index = index -1                     
+    
+    if int(index) < 0:
+        print('Task index to supplement must be greater than 0');
+
+    if value == "":
+        print("Nothing to supplement with")
+        return
+
+    filename = date + '.txt'
+    filepath = data_folder / filename
+    try:
+        Files(filepath).supplement(index,value)
+        print('Task supplemeneted')
+    except IndexError:
+        print("Incorrect task index")
+        return 1
 
 """
 remove a task
@@ -110,14 +133,14 @@ def main():
     parser.add_option(
         "-a",
         "--action",
-        help="ACTION=read|insert|clear|remove|update",
+        help="[ACTION=read | insert | clear | remove | update | supplement]",
         dest="action",
         default="read"
     )
     parser.add_option(
         "-i",
         "--index",
-        help="INDEX=task_number",
+        help="[INDEX=task_number]",
         dest="index",
         default="0"
     )    
@@ -160,12 +183,13 @@ def main():
         remove(DATA_FOLDER,date,options.index);
     elif options.action == "update":
         update(DATA_FOLDER,date,options.index,options.task);
+    elif options.action == "supplement":
+        supplement(DATA_FOLDER,date,options.index,options.task);    
     else:
         help(parser)
 
     ###################################### end of program
-     
-        
+             
 if __name__ == "__main__":
     main()
 
